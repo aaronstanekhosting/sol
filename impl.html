@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    background-color: black;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+}
+svg {
+    margin: 0;
+    display: block;
+}
+</style>
+</head>
+<body>
+<svg id="s">
+<circle id="o" stroke-width="0" fill="yellow" cx="50%" cy="50%"/>
+<circle id="e" stroke-width="0" fill="blue"/>
+<circle id="t" stroke-width="0" fill="gray"/>
+<circle id="a" stroke-width="0" fill="red"/>
+<circle id="i" stroke-width="0" fill="#f7f7d4"/>
+<circle id="n" stroke-width="0" fill="gray"/>
+</svg>
+<script>
+    'use strict'
+    function sr(i,value) {
+        document.getElementById(i).setAttribute("r",value)
+    }
+    function rs(prev_scale) {
+        var scale = Math.min(window.innerWidth,window.innerHeight)
+        if (scale != prev_scale.e) {
+            prev_scale.v = scale
+            var svg_style = document.getElementById("s").style
+            svg_style.width = scale + "px"
+            svg_style.height = scale + "px"
+            sr("o",scale/20)
+            sr("e",scale/100)
+            sr("t",scale/200)
+            sr("a",scale/150)
+            sr("i",scale/100)
+            sr("n",scale/200)
+        }
+    }
+    function pc(i,x,y) {
+        var elem = document.getElementById(i)
+        elem.setAttribute("cx",x+"%")
+        elem.setAttribute("cy",y+"%")
+    }
+    function up(angles) {
+        angles[0] = (angles[0] + 0.00150526) % 6.28318530717958648
+        angles[1] = (angles[1] + 0.0201232) % 6.28318530717958648
+        angles[2] = (angles[2] + 0.000800301) % 6.28318530717958648
+        angles[3] = (angles[3] + 0.00244685) % 6.28318530717958648
+        angles[4] = (angles[4] + 0.00625) % 6.28318530717958648
+        pc("e", 50 + Math.cos(angles[0])*33.33 - Math.cos(angles[1])*0.3, 50 - Math.sin(angles[0])*33.33 + Math.sin(angles[1])*0.3)
+        pc("t", 50 + Math.cos(angles[0])*33.33 + Math.cos(angles[1])*4, 50 - Math.sin(angles[0])*33.33 - Math.sin(angles[1])*4)
+        pc("a", 50 + Math.cos(angles[2])*44.44, 50 - Math.sin(angles[2])*44.44)
+        pc("i", 50 + Math.cos(angles[3])*22.22, 50 - Math.sin(angles[3])*22.22)
+        pc("n", 50 + Math.cos(angles[4])*13.33, 50 - Math.sin(angles[4])*13.33)
+    }
+    (function(){
+        var angles = []
+        while ( angles.length < 5 ) angles.push( Math.random() * 6.28318530717958648 )
+        setInterval(up,50,angles)
+        var prev_scale = {"e":-1}
+        window.addEventListener("resize",function(dummy){rs(prev_scale)})
+        rs(prev_scale)
+    })()
+</script>
+</body>
+</html>
