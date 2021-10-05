@@ -36,7 +36,7 @@ svg {
     function rs(prev_scale) {
         var scale = Math.min(window.innerWidth,window.innerHeight)
         if (scale != prev_scale.e) {
-            prev_scale.v = scale
+            prev_scale.e = scale
             var svg_style = document.getElementById("s").style
             svg_style.width = scale + "px"
             svg_style.height = scale + "px"
