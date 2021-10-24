@@ -2,7 +2,7 @@
 function apply_tilt(sol,x,y) {
     var ay = y * sol.tcos;
     var az = -y * sol.tsin;
-    var d = Math.sqrt(x**2+ay**2+(az-2)**2) / 2;
+    var d = Math.sqrt(x**2+ay**2+(az-sol.r)**2) / 2;
     var bx = sol.width / 2 + ((x / d)*sol.ruler);
     var by = sol.height / 2 - ((ay / d)*sol.ruler);
     return [bx,by,az,d];
@@ -32,6 +32,7 @@ class Sol {
         this.ruler = 0;
         this.canvas = document.getElementById("c")
         this.ctx = this.canvas.getContext("2d");
+        this.r = 2;
         this.elems = [];
         this.up = 0;
         this.left = 0;
@@ -63,7 +64,8 @@ class Sol {
     run() {
         this.tilt_phase = (this.tilt_phase + 0.0026179938779914945) % (2*Math.PI);
         this.left = this.tilt_phase;
-        this.tilt_linear = (1 + Math.cos(this.tilt_phase)) / 2;
+        this.r = 2 + Math.sin(this.tilt_phase);
+        this.tilt_linear = (1 + Math.cos(Math.PI*(15/32))) / 2;
         this.up = Math.PI/2-(this.tilt_linear*2.356194490192345);
         this.tcos = Math.cos(this.tilt_linear*2.356194490192345);
         this.tsin = Math.sin(this.tilt_linear*2.356194490192345);
@@ -80,7 +82,8 @@ class Star {
     }
     update(sol) {}
     draw(sol) {
-        draw_circle(sol,sol.width/2,sol.height/2,1/20,"yellow");
+        var t = apply_tilt(sol,0,0);
+        draw_circle(sol,sol.width/2,sol.height/2,0.05/t[3],"yellow");
     }
 }
 class Planet {
@@ -275,7 +278,7 @@ function main() {
         sol.elems.push(new Ring(0.3333,1));
         sol.elems.push(new Ring(0.3333,-1));
         sol.elems.push(new Back());
-        setInterval(sol.run.bind(sol),50);
+        setInterval(sol.run.bind(sol),40);
         window.addEventListener("resize",sol.resize.bind(sol));
         sol.resize();
         sol.ready = true;
