@@ -24,6 +24,92 @@ function draw_circle(sol,x,y,r,color) {
     sol.ctx.arc(x,y,sol.ruler*r,0,2*Math.PI);
     sol.ctx.fill();
 }
+class Driver1 {
+    constructor() {
+        this.progress = 0;
+    }
+    update(sol) {
+        this.progress += (1/1500);
+        if (this.progress >= 1) {
+            this.progress = 1;
+            sol.driver = new Driver2();
+            sol.left_rate *= -2;
+        }
+        sol.tilt_phase = (1.2*Math.PI)*this.progress + 1;
+        sol.left = Math.PI * this.progress;
+    }
+}
+class Driver2 {
+    constructor() {
+        this.progress = 0;
+    }
+    update(sol) {
+        this.progress += (1/750);
+        if (this.progress >= 1) {
+            this.progress = 1;
+            sol.driver = new Driver3();
+            sol.left_rate *= -0.5;
+        }
+        sol.left = Math.PI * (1-this.progress);
+    }
+}
+class Driver3 {
+    constructor() {
+        this.progress = 0;
+    }
+    update(sol) {
+        this.progress += (1/750);
+        if (this.progress >= 1) {
+            this.progress = 1;
+            sol.driver = new Driver4();
+        }
+        sol.left = (Math.PI/2) * this.progress;
+        sol.r = 2 + this.progress;
+    }
+}
+class Driver4 {
+    constructor() {
+        this.progress = 0;
+    }
+    update(sol) {
+        this.progress += (1/1500);
+        if (this.progress >= 1) {
+            this.progress = 1;
+            sol.driver = new Driver5();
+        }
+        sol.left = Math.PI * (this.progress + 0.5);
+        sol.r = 3 - 2 * this.progress;
+    }
+}
+class Driver5 {
+    constructor() {
+        this.progress = 0;
+    }
+    update(sol) {
+        this.progress += (1/750);
+        if (this.progress >= 1) {
+            this.progress = 1;
+            sol.driver = new Driver6();
+            sol.left_rate = 0;
+        }
+        sol.left = (Math.PI / 2) * (this.progress-1);
+        sol.r = 1 + this.progress;
+    }
+}
+class Driver6 {
+    constructor() {
+        this.progress = 0;
+    }
+    update(sol) {
+        this.progress += (1/750);
+        if (this.progress >= 1) {
+            this.progress = 1;
+            sol.driver = new Driver1();
+            sol.left_rate = Math.PI/1500;
+        }
+        sol.tilt_phase = (2*Math.PI-1) * this.progress + (1.2*Math.PI+1) * (1-this.progress);
+    }
+}
 class Sol {
     constructor() {
         this.ready = false;
@@ -36,11 +122,12 @@ class Sol {
         this.elems = [];
         this.up = 0;
         this.left = 0;
-        this.left_rate = 0.0026179938779914945;
+        this.left_rate = Math.PI/1500;
         this.tilt_phase = 1;
         this.tilt_linear = 0;
         this.tcos = 0;
         this.tsin = 0;
+        this.driver = new Driver1();
     }
     draw() {
         this.ctx.beginPath();
@@ -62,10 +149,8 @@ class Sol {
         }
     }
     run() {
-        this.tilt_phase = (this.tilt_phase + 0.0026179938779914945) % (2*Math.PI);
-        this.left = this.tilt_phase;
-        this.r = 2 + Math.sin(this.tilt_phase);
-        this.tilt_linear = (1 + Math.cos(Math.PI*(15/32))) / 2;
+        this.driver.update(this);
+        this.tilt_linear = (1 + Math.cos(this.tilt_phase)) / 2;
         this.up = Math.PI/2-(this.tilt_linear*2.356194490192345);
         this.tcos = Math.cos(this.tilt_linear*2.356194490192345);
         this.tsin = Math.sin(this.tilt_linear*2.356194490192345);
